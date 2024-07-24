@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7213098939520175250}
   - component: {fileID: 4019795040694393395}
-  - component: {fileID: 6072671461239717281}
+  - component: {fileID: 6756558997662924147}
   m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 10
   health: 0
---- !u!114 &6072671461239717281
+--- !u!114 &6756558997662924147
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -60,8 +60,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8856dc480c1868044989c43878470400, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effect: {fileID: 34392788690915148, guid: 57c79979a83c12d4cb9b2d43fab2b0de, type: 3}
-  timer: 1
+  items:
+  - timer: 1
+    drop: {fileID: 34392788690915148, guid: 57c79979a83c12d4cb9b2d43fab2b0de, type: 3}
 --- !u!1 &4847552091423989238
 GameObject:
   m_ObjectHideFlags: 0

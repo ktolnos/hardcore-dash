@@ -249,8 +249,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8856dc480c1868044989c43878470400, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effect: {fileID: 1249300757128072070, guid: 3f3f70ab277a1e945ae8163caf5dfbda, type: 3}
-  timer: 1
+  items:
+  - timer: 1
+    drop: {fileID: 1249300757128072070, guid: 3f3f70ab277a1e945ae8163caf5dfbda, type: 3}
 --- !u!54 &21707043592446011
 Rigidbody:
   m_ObjectHideFlags: 0
