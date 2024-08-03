@@ -15,16 +15,21 @@ public class PlayerMovement : MonoBehaviour
     public float decelerationTime = 0.2f;
     public float dashHeight = 0.1f;
     public float distanceOfSphereCast = 0.5f;
-    public float radiusOfSphereCast = 1;
+    public float radiusOfDashDamage = 1.2f;
     public float dashDamage = 10;
     private Quaternion angle = Quaternion.Euler(0, 45, 0);
     public GameObject dashDestinationMarker;
     public GameObject Marker;
     public Gun gun;
+    public GameObject gunPosition;
     public GameObject powerLandingEffect;
+    public AnimationCurve screenShakeCurve;
+    public float screenShakeDuration = 0.5f;
     public AudioClip jumpSound;
     public AudioClip landingSound;
     public AudioClip dashSound;
+    public AudioClip drop;
+    public AudioClip loot;
     private Rigidbody _rigidbody;
     private AudioSource _audioSource;
     private bool isDashing;
@@ -34,10 +39,12 @@ public class PlayerMovement : MonoBehaviour
     private bool startDashing = false;
     private bool startJumping = false;
     private bool isJumping = false;
+    private CameraMover cameraMover;
     private void Start()
     {
         _rigidbody = GetComponent<Rigidbody>();
         _audioSource = GetComponent<AudioSource>();
+        cameraMover = FindAnyObjectByType<CameraMover>();
     }
 
     private void Update()
@@ -52,6 +59,9 @@ public class PlayerMovement : MonoBehaviour
             startJumping = true;
             isJumping = true;
         }
+        if(gun != null && Input.GetKeyDown(KeyCode.Q)){
+            DropGun();
+        }
     }
 
     private void FixedUpdate()
@@ -59,6 +69,7 @@ public class PlayerMovement : MonoBehaviour
         _rigidbody.useGravity = !isDashing;
         var isOnGround = Physics.BoxCast(transform.position + Vector3.up*0.15f, new Vector3(0.5f, 0.1f, 0.5f), Vector3.down, transform.rotation, 0.2f);
         if(isOnGround && isJumping && !startJumping){
+            cameraMover.ScreenShake(screenShakeDuration, screenShakeCurve);
             _audioSource.PlayOneShot(landingSound);
             Destroy(Instantiate(powerLandingEffect, transform.position, transform.rotation), 1);
             var hits = Physics.SphereCastAll(transform.position + Vector3.up*0.5f, radiusOfJumpHit, Vector3.down);
@@ -91,6 +102,21 @@ public class PlayerMovement : MonoBehaviour
         HandleMouse();
         startJumping = false;
     }
+    void OnCollisionEnter(Collision other)
+    {
+        if(other.transform.gameObject.layer == LayerMask.NameToLayer("Loot") && (gun == null || gun.ammo == 0)){
+            if(gun != null){
+                DropGun();
+            }
+            _audioSource.PlayOneShot(loot);
+            gun = other.gameObject.GetComponent<Gun>();
+            gun.transform.parent = transform;
+            Utils.SetLayer(gun.gameObject, "Player");
+            var gun_rb = gun.GetComponent<Rigidbody>();
+            gun_rb.isKinematic = true;
+            gun.transform.position = gunPosition.transform.position;
+        }
+    }
 
     private void HandleMouse()
     {
@@ -105,7 +131,9 @@ public class PlayerMovement : MonoBehaviour
         Marker.transform.position = didHit ? hit.point : dashPosition;
         dashDestinationMarker.SetActive(didHit && Marker.transform.position.y <= dashPosition.y + 0.001f);
         transform.LookAt(dashPosition);
-        gun.transform.LookAt(Marker.transform.position + Vector3.up*0.5f);
+        if(gun != null){
+            gun.transform.LookAt(Marker.transform.position + Vector3.up*0.5f);
+        }
         if (startDashing)
         {
             isDashing = true;
@@ -116,7 +144,7 @@ public class PlayerMovement : MonoBehaviour
         }
         
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && gun != null)
         {
             gun.Shoot();
         }
@@ -131,20 +159,21 @@ public class PlayerMovement : MonoBehaviour
     {
         var currentSpeed = dashSpeed * Mathf.Clamp01((Time.time - timeOfStart) / accelerationTime);
         Vector3 movement = dashTargetPosition - transform.position;
-        foreach (var sphereHit in Physics.SphereCastAll(transform.position + Vector3.up*(radiusOfSphereCast+0.1f) + Vector3.forward*0.5f, radiusOfSphereCast, movement,
-                     distanceOfSphereCast, LayerMask.GetMask("Enemy", "Default")))
+        foreach (var _ in Physics.BoxCastAll(transform.position + Vector3.up*0.6f, Vector3.one/2, movement, transform.rotation,
+                    currentSpeed*Time.fixedDeltaTime , LayerMask.GetMask("Default")))
         {
-            if (sphereHit.collider.gameObject.layer == LayerMask.NameToLayer("Default") )
-            {
-                isDashing = false;
-                return;
-            }
-            DamageEnemy(sphereHit.collider);
+            isDashing = false;
+            return;
         }
-
+        foreach (var sphereHit in Physics.SphereCastAll(transform.position + Vector3.up*radiusOfDashDamage + Vector3.forward*0.5f, radiusOfDashDamage, movement,
+                     distanceOfSphereCast, LayerMask.GetMask("Enemy")))
+        {
+            DamageEnemy(sphereHit.collider);
+            cameraMover.ScreenShake(screenShakeDuration, screenShakeCurve);
+        }
         if (movement.magnitude < currentSpeed * Time.fixedDeltaTime)
         {
-            _rigidbody.velocity = movement.normalized * Time.fixedDeltaTime;
+            _rigidbody.velocity = movement * Time.fixedDeltaTime;
             isDashing = false;
             return;
         }
@@ -156,5 +185,14 @@ public class PlayerMovement : MonoBehaviour
     {
         var damagable = other.GetComponentInParent<Damagable>();
         damagable.TakeDamage(dashDamage);
+    }
+    private void DropGun(){
+        _audioSource.PlayOneShot(drop);
+        gun.transform.parent = null;
+        Utils.SetLayer(gun.gameObject, "PlayerBullet");
+        var gun_rb =  gun.GetComponent<Rigidbody>();
+        gun_rb.isKinematic = false;
+        gun.GetComponent<Bullet>().enabled = true;
+        gun = null;
     }
 }

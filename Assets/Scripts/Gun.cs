@@ -11,6 +11,7 @@ public class Gun : MonoBehaviour
     public GameObject bullet;
     public float spread = 5;
     public int amountOfBullets = 1;
+    public int ammo = 30;
     public AudioClip shot;
     public GameObject bulletSpawn;
     private AudioSource _audioSource;
@@ -24,16 +25,16 @@ public class Gun : MonoBehaviour
 
     public void Shoot()
     {
-        if (Time.time - timeOfLastShot < fireRate)
+        if (Time.time - timeOfLastShot < fireRate || ammo <= 0)
         {
             return;
         }
-
+        ammo -= 1;
         for (int i = 0; i < amountOfBullets; i++)
         {
             _audioSource.PlayOneShot(shot);
             var spreadRotation = Quaternion.Euler(0,Random.value*spread - spread/2, 0);
-            Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation * spreadRotation);
+            Destroy(Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation * spreadRotation), 10);
             timeOfLastShot = Time.time;
         }
     } 

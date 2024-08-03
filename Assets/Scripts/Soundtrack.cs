@@ -10,7 +10,6 @@ public class Soundtrack : MonoBehaviour
     private AudioSource _audioSource2;
     private float startOfPlayingNewTrack;
     private bool isChanging = false;
-    private bool isFirstTime = true;
     private int indexOfTrack = 0;
 
     void Start()
@@ -18,16 +17,13 @@ public class Soundtrack : MonoBehaviour
         var _audioSources = GetComponents<AudioSource>();
         _audioSource1 = _audioSources[0];
         _audioSource2 = _audioSources[1];
+        
+        _audioSource1.PlayOneShot(soundtracks[indexOfTrack]);
+        startOfPlayingNewTrack = Time.time;
     }
-    void FixedUpdate()
-    {
-        if (isFirstTime){
-            isFirstTime = false;
-            _audioSource1.PlayOneShot(soundtracks[indexOfTrack]);
-            startOfPlayingNewTrack = Time.time;
-            return;
-        }
 
+    void Update()
+    {
         if(Time.time - startOfPlayingNewTrack >= soundtracks[indexOfTrack].length-crossFadeTime){
             isChanging = true;
             indexOfTrack = (indexOfTrack + 1)%soundtracks.Count;
@@ -43,14 +39,13 @@ public class Soundtrack : MonoBehaviour
         if(isChanging){
             if(Time.time-startOfPlayingNewTrack >= crossFadeTime){
                 isChanging = false;
-                return;
             }
             if(indexOfTrack%2 == 1){
-                _audioSource1.volume = (Time.time - startOfPlayingNewTrack)/crossFadeTime;
+                _audioSource1.volume = Mathf.Clamp01((Time.time - startOfPlayingNewTrack)/crossFadeTime);
                 _audioSource2.volume = 1-_audioSource1.volume;
             }else{
-                _audioSource2.volume = (Time.time - startOfPlayingNewTrack)/crossFadeTime;
-                _audioSource1.volume = 1-_audioSource1.volume;
+                _audioSource2.volume = Mathf.Clamp01((Time.time - startOfPlayingNewTrack)/crossFadeTime);
+                _audioSource1.volume = 1-_audioSource2.volume;
             }
         }
     }

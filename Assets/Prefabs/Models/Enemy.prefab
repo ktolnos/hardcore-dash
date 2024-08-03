@@ -63,6 +63,8 @@ MonoBehaviour:
   items:
   - timer: 1
     drop: {fileID: 34392788690915148, guid: 57c79979a83c12d4cb9b2d43fab2b0de, type: 3}
+  - timer: 100
+    drop: {fileID: 8787311944868295596, guid: dc27bf5abb070134299d1e1a22388add, type: 3}
 --- !u!1 &4847552091423989238
 GameObject:
   m_ObjectHideFlags: 0

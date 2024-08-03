@@ -9,14 +9,17 @@ public class Bullet : MonoBehaviour
     public float damage = 5;
     public float speed = 20;
     public int piercing = 0;
-    private void Start()
+    private void OnEnable()
     {
         var ridgidbody = GetComponent<Rigidbody>();
         ridgidbody.AddForce(transform.forward*speed, ForceMode.Impulse);
     }
 
     private void OnCollisionEnter(Collision other)
-    {
+    {   
+        if(!enabled){
+            return;
+        }
         var _damagable = other.collider.gameObject.GetComponentInParent<Damagable>();
         if (_damagable != null)
         {
