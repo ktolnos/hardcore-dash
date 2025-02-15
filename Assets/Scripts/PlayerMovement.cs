@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody _rigidbody;
     private AudioSource _audioSource;
     private bool isDashing;
-    
+    private Damagable playerDamagable;
     private float timeOfStart;
     private Vector3 dashTargetPosition;
     private bool startDashing = false;
@@ -45,11 +46,12 @@ public class PlayerMovement : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
         _audioSource = GetComponent<AudioSource>();
         cameraMover = FindAnyObjectByType<CameraMover>();
+        playerDamagable = GetComponent<Damagable>();
     }
 
     private void Update()
     {
-        if ((Input.GetMouseButtonDown(1)|| Input.GetKeyDown(KeyCode.LeftShift)) && !isDashing)
+        if ((Input.GetMouseButtonDown(1)|| Input.GetKeyDown(KeyCode.LeftAlt)) && !isDashing)
         {
             startDashing = true;
             _audioSource.PlayOneShot(dashSound);
@@ -71,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
         if(isOnGround && isJumping && !startJumping){
             cameraMover.ScreenShake(screenShakeDuration, screenShakeCurve);
             _audioSource.PlayOneShot(landingSound);
-            Destroy(Instantiate(powerLandingEffect, transform.position, transform.rotation), 1);
+            Destroy(Instantiate(powerLandingEffect, transform.position, transform.rotation), 0.5f);
             var hits = Physics.SphereCastAll(transform.position + Vector3.up*0.5f, radiusOfJumpHit, Vector3.down);
             foreach (var hit in hits)
             {
@@ -96,8 +98,8 @@ public class PlayerMovement : MonoBehaviour
                 _audioSource.PlayOneShot(jumpSound);
             }
             movement = angle * movement;
-            movement.y = _rigidbody.velocity.y;
-            _rigidbody.velocity = movement;
+            movement.y = _rigidbody.linearVelocity.y;
+            _rigidbody.linearVelocity = movement;
         }
         HandleMouse();
         startJumping = false;
@@ -173,17 +175,18 @@ public class PlayerMovement : MonoBehaviour
         }
         if (movement.magnitude < currentSpeed * Time.fixedDeltaTime)
         {
-            _rigidbody.velocity = movement * Time.fixedDeltaTime;
+            _rigidbody.linearVelocity = movement / Time.fixedDeltaTime;
             isDashing = false;
             return;
         }
 
-        _rigidbody.velocity = movement.normalized * currentSpeed;
+        _rigidbody.linearVelocity = movement.normalized * currentSpeed;
     }
 
     private void DamageEnemy(Collider other)
     {
         var damagable = other.GetComponentInParent<Damagable>();
+        playerDamagable.Heal(damagable.health);
         damagable.TakeDamage(dashDamage);
     }
     private void DropGun(){

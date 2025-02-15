@@ -15,6 +15,7 @@ public class Gun : MonoBehaviour
     public AudioClip shot;
     public GameObject bulletSpawn;
     private AudioSource _audioSource;
+    public GameObject shotEffect;
     private float timeOfLastShot;
 
     private void Start()
@@ -35,6 +36,7 @@ public class Gun : MonoBehaviour
             _audioSource.PlayOneShot(shot);
             var spreadRotation = Quaternion.Euler(0,Random.value*spread - spread/2, 0);
             Destroy(Instantiate(bullet, bulletSpawn.transform.position, bulletSpawn.transform.rotation * spreadRotation), 10);
+            Destroy(Instantiate(shotEffect, bulletSpawn.transform.position, bulletSpawn.transform.rotation), 0.1f);
             timeOfLastShot = Time.time;
         }
     } 

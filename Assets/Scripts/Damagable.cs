@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 public class Damagable : MonoBehaviour
 {
     public float maxHealth = 10;
-    [SerializeField] private float health;
+    public float health;
 
     public delegate void OnDead();
 
@@ -25,5 +25,10 @@ public class Damagable : MonoBehaviour
             onDead();
             Destroy(gameObject);
         }
+    }
+
+    public void Heal(float heal)
+    {
+        health += heal;
     }
 }

@@ -90,6 +90,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -152,7 +155,7 @@ GameObject:
   - component: {fileID: 5237988020966192839}
   - component: {fileID: 1394084436480555033}
   m_Layer: 10
-  m_Name: Gun
+  m_Name: Pistol
   m_TagString: Lootable gun
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -187,13 +190,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52b0ef15a6dfba34cb19fae1707241c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireRate: 0.1
+  fireRate: 0.5
   bullet: {fileID: 1687214067511787624, guid: ffce28bf5b515914288c94aab5322310, type: 3}
   spread: 3
   amountOfBullets: 1
-  ammo: 20
+  ammo: 30
   shot: {fileID: 8300000, guid: 17e1c7d734efdb545afab6682a0ccabb, type: 3}
   bulletSpawn: {fileID: 1570152261480162673}
+  shotEffect: {fileID: 1249300757128072070, guid: 461ede3342bf48c4aaee203753e4ec41,
+    type: 3}
 --- !u!82 &4383678473808466717
 AudioSource:
   m_ObjectHideFlags: 0
@@ -203,8 +208,10 @@ AudioSource:
   m_GameObject: {fileID: 8787311944868295596}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 8537875361757343906, guid: 7cf772d975db82e4cb05718915537951,
+    type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 0.792
   m_Pitch: 1
@@ -330,8 +337,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
-  speed: 30
+  speed: 15
   piercing: 0
+  enemy: 0
 --- !u!114 &5237988020966192839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,6 +373,9 @@ TrailRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

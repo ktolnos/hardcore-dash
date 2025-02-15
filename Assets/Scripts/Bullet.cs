@@ -9,6 +9,7 @@ public class Bullet : MonoBehaviour
     public float damage = 5;
     public float speed = 20;
     public int piercing = 0;
+    public bool enemy = false;
     private void OnEnable()
     {
         var ridgidbody = GetComponent<Rigidbody>();
@@ -18,6 +19,12 @@ public class Bullet : MonoBehaviour
     private void OnCollisionEnter(Collision other)
     {   
         if(!enabled){
+            return;
+        }
+
+        if (enemy && other.gameObject.layer == LayerMask.GetMask("Enemy"))
+        {
+            Debug.Log(other.gameObject.name);
             return;
         }
         var _damagable = other.collider.gameObject.GetComponentInParent<Damagable>();
